@@ -1,9 +1,11 @@
 import tkinter as tk
+from front_end.login import Login
 
 
 # I'm using an OOP approach for this app.
 # Check this Stack Overflow answer:
 # https://stackoverflow.com/questions/17466561/best-way-to-structure-a-tkinter-application/17470842#17470842
+
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -13,6 +15,8 @@ class MainApplication(tk.Frame):
         # Initialize rest of the GUI here.
         greeting = tk.Label(text="Hello world!")
         greeting.pack()
+
+        Login(root)
 
 
 # Try running this!
