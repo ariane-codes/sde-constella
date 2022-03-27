@@ -1,5 +1,6 @@
 import tkinter as tk
 from front_end.login import Login
+from database.database import Database
 
 
 # I'm using an OOP approach for this app.
@@ -16,7 +17,8 @@ class MainApplication(tk.Frame):
         greeting = tk.Label(text="Hello world!")
         greeting.pack()
 
-        Login(root)
+        db=Database('constella_dev_db_KC2Y')
+        db.query("select * from employee")
 
 
 # Try running this!
