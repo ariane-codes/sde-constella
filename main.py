@@ -18,7 +18,11 @@ class MainApplication(tk.Frame):
         greeting.pack()
 
         db=Database('constella_dev_db_KC2Y')
-        db.query("select * from employee")
+        query_result = db.query("select * from employee")
+        print("Database query result: " + str(query_result))
+        response = db.login('natalie.smith', 'C0n$t3ll4')
+        print("Status: " + str(response['status']))
+        print("Message: " + str(response['message']))
 
 
 # Try running this!
