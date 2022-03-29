@@ -17,12 +17,13 @@ class MainApplication(tk.Frame):
         greeting = tk.Label(text="Hello world!")
         greeting.pack()
 
-        db=Database('constella_dev_db_KC2Y')
-        query_result = db.query("select * from employee")
-        print("Database query result: " + str(query_result))
-        response = db.login('natalie.smith', 'C0n$t3ll4')
-        print("Status: " + str(response['status']))
-        print("Message: " + str(response['message']))
+    # Initial Testing code
+    db=Database('constella_dev_db_KC2Y')
+    query_result = db.query("select * from employee")
+    print("Database query result: " + str(query_result))
+    response = db.login('natalie.smith', 'C0n$t3ll4')
+    print("Status: " + str(response['status']))
+    print("Message: " + str(response['message']))
 
 
 # Try running this!
