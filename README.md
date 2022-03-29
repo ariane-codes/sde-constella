@@ -2,6 +2,20 @@
 
 Hello team! This is our repository, where we'll develop the product for Constella. Please read carefully before contributing.
 
+## Install Dependencies
+
+The first time you run this, you'll need to install the dependencies specified in `requirements.txt`. In order to do this, in your terminal, run:
+
+```
+pip install -r requirements.txt
+```
+
+You'll only need to do this once when you begin working on the project, and then every time a teammate adds a dependency.
+
+## Environment Variables
+
+In order to keep the database details secure, you've been given an `.env` file via Discord that you need to add to your local repo. This is ignored by Git and will not be uploaded, so as to keep the credentials safe. Make sure yo uplace the `.env` file at the root of your repository.
+
 ## Git Branching
 
 I have disabled pushing and merging to `main` without a Pull Request with at least one approval. This means you must: 1. create a branch where you push your code, and 2. create a pull request in Github to request your code be merged to the `main` branch.
