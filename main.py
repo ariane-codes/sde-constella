@@ -1,4 +1,6 @@
 import tkinter as tk
+from front_end.login import Login
+from database.database import Database
 
 
 # I'm using an OOP approach for this app.
@@ -14,8 +16,6 @@ class MainApplication(tk.Frame):
         greeting = tk.Label(text="Hello world!")
         greeting.pack()
 
-<<<<<<< Updated upstream
-=======
     # Initial Testing code
     db=Database()
     reviews = db.get_reviews()
@@ -25,7 +25,6 @@ class MainApplication(tk.Frame):
     print("Status: " + str(response['status']))
     print("Message: " + str(response['message']))
 
->>>>>>> Stashed changes
 
 # Try running this!
 if __name__ == '__main__':
