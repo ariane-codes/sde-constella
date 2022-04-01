@@ -18,9 +18,10 @@ class MainApplication(tk.Frame):
         greeting.pack()
 
     # Initial Testing code
-    db=Database('constella_dev_db_KC2Y')
-    query_result = db.query("select * from employee")
-    print("Database query result: " + str(query_result))
+    db=Database()
+    reviews = db.get_reviews()
+    for review in reviews:
+        print(str(review['review_created']) + "  " + review['review_title'] + "  " + str(review['review_star_rating']))
     response = db.login('natalie.smith', 'C0n$t3ll4')
     print("Status: " + str(response['status']))
     print("Message: " + str(response['message']))
