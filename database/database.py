@@ -1,8 +1,13 @@
-import mysql.connector as mysql
 import os
+import mysql.connector as mysql
 from dotenv import load_dotenv
 
 class Database:
+    """ Wrapper class for all database related funtions"""
+    def __init__(self):
+        self.mydb = None
+        self.mycursor = None
+
     # Private database connection function
     def __connect(self):
         try:
@@ -16,8 +21,8 @@ class Database:
                 db = os.getenv('DB_DATABASE')
             )
             print("Database connected")
-        except mysql.Error as e:
-            print(e)
+        except mysql.Error as err:
+            print(err)
         self.mycursor = self.mydb.cursor()
 
     # Private database connection close function
@@ -26,65 +31,71 @@ class Database:
             self.mycursor.close()
             self.mydb.close()
             print("Database connection closed")
-        except mysql.Error as e:
-            print(e)
-
+        except mysql.Error as err:
+            print(err)
 
     # Database login funcion takes username and password as parameters
     # and returns dictionary containing status & message
     def login(self, username, password):
+        """  Login function takes a username and password
+        and returns dictionary containing 'status: 200 and success message'
+        or 'status: 400 & login failed message' """
         # check db for username
         sql = "select * from employee where username = %s"
         val = username
         self.__connect()
         try:
             self.mycursor.execute(sql, (val,))
-        except mysql.Error as e:
-            print(e)
+        except mysql.Error as err:
+            print(err)
         myresult = self.mycursor.fetchone()
         self.__close()
         # if username is found check password
         if myresult:
-            # if passed password parameter matches password for matched username result(column 5) return 200 - success
+            # if passed password parameter matches password for matched username
+            # result(column 5) return 200 - success
             if password == myresult[5]:
                 return {"status": 200, "message": "Login successful"}
-            # if password doesn't match return 400 - Error 
-            else:
-                return {"status": 400, "message": "Incorrect username or password"}
-        # if username is not found return 400 - Error 
-        else:
+            # if password doesn't match return 400 - Error
             return {"status": 400, "message": "Incorrect username or password"}
-        
+        # if username is not found return 400 - Error
+        return {"status": 400, "message": "Incorrect username or password"}   
 
     # Database query funtion takes sql query as a string and prints + returns results
     def query(self, sql):
+        """  sql query funciton that takes an sql query as a string
+        and returns = prints the results a list object of results """
         self.__connect()
         try:
             self.mycursor.execute(sql)
             myresult = self.mycursor.fetchall()
             self.__close()
             return myresult
-        except mysql.Error as e:
-            print(e) 
+        except mysql.Error as err:
+            print(err)
             self.__close()
+            return err
 
-    # This function returns 'page_size' number of reviews that have not been 
-    # assigned to an employee, have 'stars' number of stars or less and have 
-    # and id number greater than 'last_review_id' ordered by created date decending
-    #
     def get_reviews(self, stars=3,page_size=5, last_review_id=0):
+        """This function returns 'page_size' number of reviews that have not been
+        assigned to an employee, have 'stars' number of stars or less and have
+        and id number greater than 'last_review_id' ordered by created date decending """
         self.__connect()
-        sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
-        " <= %s AND id > %s ORDER BY id DESC LIMIT %s"
-        vals = (stars, last_review_id, page_size)
+        if last_review_id > 0:
+            sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
+            " <= %s AND id < %s ORDER BY id DESC LIMIT %s"
+            vals = (stars, last_review_id, page_size)
+        else:
+            sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
+                " <= %s ORDER BY id DESC LIMIT %s"
+            vals = (stars, page_size)     
         try:
             self.mycursor.execute(sql, vals)
             # Tested with fetchmany(page_size) but this was slower than using sql LIMIT
             myresult = self.mycursor.fetchall()
             self.__close()
             reviews = []
-            review = {}
-            for index, row in enumerate(myresult):
+            for row in myresult:
                 temp_dict = {"review_id" : row[0],
                              "review_product_title" : row[1],
                              "review_product_category" : row[2],
@@ -99,6 +110,7 @@ class Database:
                             }
                 reviews.append(temp_dict)
             return reviews
-        except mysql.Error as e:
-            print(e) 
+        except mysql.Error as err:
+            print(err)
             self.__close()
+            return err
