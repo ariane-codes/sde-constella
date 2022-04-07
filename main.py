@@ -50,6 +50,8 @@ class Application(tk.Tk):
         for review in reviews:
             print(str(review['review_created']) + "  " + review['review_title'] + "  " + str(review['review_star_rating']))
 
+    
+
 
 # Try running this!
 if __name__ == '__main__':
