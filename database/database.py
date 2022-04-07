@@ -59,17 +59,18 @@ class Database:
             # if password doesn't match return 400 - Error
             return {"status": 400, "message": "Incorrect username or password"}
         # if username is not found return 400 - Error
-        return {"status": 400, "message": "Incorrect username or password"}   
+        return {"status": 400, "message": "Incorrect username or password"}
 
     # Database query funtion takes sql query as a string and prints + returns results
     def query(self, sql):
-        """  sql query funciton that takes an sql query as a string
+        """  sql query function that takes an sql query as a string
         and returns = prints the results a list object of results """
         self.__connect()
         try:
             self.mycursor.execute(sql)
             myresult = self.mycursor.fetchall()
             self.__close()
+            print(myresult)
             return myresult
         except mysql.Error as err:
             print(err)
@@ -114,3 +115,18 @@ class Database:
             print(err)
             self.__close()
             return err
+
+    def assign_review(self, employee_id, review_id):
+        """ Takes an employee id and review id and adds the employee to the
+        review with the matching review id  """
+        self.__connect()
+        try:
+            sql = "UPDATE review set employee_id = %s\
+                   WHERE id = %s"
+            vals = (employee_id, review_id)
+            self.mycursor.execute(sql, vals)
+            self.mydb.commit()
+        except mysql.Error as e:
+            print("MYSQL Error: " + str(e))
+        self.__close()
+
