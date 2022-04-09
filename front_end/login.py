@@ -9,51 +9,79 @@ class Login(tk.Frame):
         self.parent = parent
         self.db = db
         self.controller = controller
-        self.show_error_message = False
-        self.error_message = ""
+        # Adding these vars to the constructor, so they're accessible to the other Class methods
+        self.email = tk.StringVar()
+        self.password = tk.StringVar()
 
+        # Setting column configure so everything is well spread horizontally
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
         self.columnconfigure(3, weight=1)
 
+        # Title
         font = tkFont.Font(family="Helvetica", size=24, weight="bold")
-
-        # Initialize rest of the GUI here.
         title = tk.Label(self, text="Welcome to Constella!")
-        title.grid(row=0, column=0, columnspan=4)
+        title.grid(row=0, column=0, columnspan=4, padx=15, pady=45)
         title.configure(font=font)
 
-        username = tk.StringVar()
-        password = tk.StringVar()
+        # Email Label
+        email_label = tk.Label(self, text="Email")
+        email_label.grid(row=1, column=1, sticky=tk.E, padx=15, pady=15)
 
-        # Username Label
-        usernameLabel = tk.Label(self, text="Username")
-        usernameLabel.grid(row=1, column=1)
-
-        # Username write box
-        userEntry = tk.Entry(self, textvariable=username)
-        userEntry.grid(row=1, column=2)
+        # Email write box
+        email_entry = tk.Entry(self, textvariable=self.email)
+        email_entry.grid(row=1, column=2, sticky=tk.W, padx=15, pady=15)
 
         # Password Label
-        passwordLabel = tk.Label(self, text="Password")
-        passwordLabel.grid(row=3, column=1)
+        password_label = tk.Label(self, text="Password")
+        password_label.grid(row=3, column=1, sticky=tk.E, padx=15, pady=15)
 
         # Password write box
-        passwordEntry = tk.Entry(self, textvariable=password, show="*")
-        passwordEntry.grid(row=3, column=2)
-        title.configure(bg="light grey")
+        password_entry = tk.Entry(self, textvariable=self.password, show="*")
+        password_entry.grid(row=3, column=2, sticky=tk.W, padx=15, pady=15)
 
-        loginButton = tk.Button(self, text="Login", command=lambda: self.handle_login(username, password))
-        loginButton.grid(row=4, column=0, columnspan=4)
+        # Add trace callbacks to the string vars
+        self.email.trace("w", self.on_input_change)
+        self.password.trace("w", self.on_input_change)
 
+        # The login button is also added to the constructor (self.)
+        # so we can access it through other methods
+        self.login_button = tk.Button(self, text="Login",
+                                      # Calling handle_login as the command for the login button.
+                                      command=lambda: self.handle_login(self.email, self.password))
+        self.login_button.config(state="disabled", width=30)  # Button starts disabled
+        self.login_button.grid(row=4, column=0, columnspan=4, pady=30)
+
+        # Login error label
+        self.error_label = tk.Label(self, text="Error logging in. Please try again.")
+        self.error_label.configure(fg="red")
+
+    # This function handles the login button
     def handle_login(self, email, password):
+        # If the error label is present, remove it while we log in.
+        self.error_label.grid_forget()
+
+        # Call the login function from the database
         response = self.db.login(email.get(), password.get())
-        if response["status"] == 200:
-            self.controller.show_frame("ReviewList")
+
+        if response["status"] == 200:  # If the response is 200
+            # Todo: Phil is working on returning all the employee data here,
+            #  Store it safely in the MainApplication using the controller.
+            self.controller.show_frame("ReviewList")  # go to the ReviewList frame
+        else:  # otherwise
+            self.error_label.grid(row=5, column=0, columnspan=4)  # Display error message.
+
+    # This function is called each time a key is pressed on email or password.
+    def on_input_change(self, *args):
+        email_string = self.email.get()
+        password_string = self.password.get()
+        if email_string and password_string:
+            # Enable the login button if both email and password exist.
+            self.login_button.config(state="normal")
         else:
-            self.show_error_message = True
-            self.error_message = "Error logging in"
+            self.login_button.config(state="disabled")
+
 
 
 
