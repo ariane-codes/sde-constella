@@ -21,7 +21,7 @@ class Application(tk.Tk):
 
         self.db = Database()
         self.employee = {
-            "name": ""
+            "name": "Dummy Name"
         }
 
         container = tk.Frame(self)
