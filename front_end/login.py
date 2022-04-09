@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.font as tkFont
 from database.database import Database
 
 
@@ -8,46 +9,51 @@ class Login(tk.Frame):
         self.parent = parent
         self.db = db
         self.controller = controller
+        self.show_error_message = False
+        self.error_message = ""
+
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+        self.columnconfigure(3, weight=1)
+
+        font = tkFont.Font(family="Helvetica", size=24, weight="bold")
 
         # Initialize rest of the GUI here.
         title = tk.Label(self, text="Welcome to Constella!")
-        title.place(x=320, y=30)
-        title.config(font=("Verdana", 24))
-        title.configure(bg="light grey")
+        title.grid(row=0, column=0, columnspan=4)
+        title.configure(font=font)
 
         username = tk.StringVar()
         password = tk.StringVar()
 
         # Username Label
         usernameLabel = tk.Label(self, text="Username")
-        usernameLabel.place(x=320, y=200)
-        usernameLabel.configure(bg="light grey")
+        usernameLabel.grid(row=1, column=1)
 
         # Username write box
         userEntry = tk.Entry(self, textvariable=username)
-        userEntry.place(x=397, y=197)
+        userEntry.grid(row=1, column=2)
 
         # Password Label
         passwordLabel = tk.Label(self, text="Password")
-        passwordLabel.place(x=320, y=250)
-        passwordLabel.configure(bg="light grey")
+        passwordLabel.grid(row=3, column=1)
 
         # Password write box
         passwordEntry = tk.Entry(self, textvariable=password, show="*")
-        passwordEntry.place(x=397, y=250)
+        passwordEntry.grid(row=3, column=2)
         title.configure(bg="light grey")
 
-        # login button to enter to Constella
-        # Paola: The command here will be something like
-        # command=lambda: self.db.login(username, password)
-        # You'll have to experiment or wrap that function in another one
-        # So that you can handle the messages.
+        loginButton = tk.Button(self, text="Login", command=lambda: self.handle_login(username, password))
+        loginButton.grid(row=4, column=0, columnspan=4)
 
-        # Right now, the button just switches to the review list.
-
-        loginButton = tk.Button(self, text="Login", command=lambda: controller.show_frame("ReviewList"))
-        loginButton.place(x=450, y=340)
-
+    def handle_login(self, email, password):
+        response = self.db.login(email.get(), password.get())
+        if response["status"] == 200:
+            self.controller.show_frame("ReviewList")
+        else:
+            self.show_error_message = True
+            self.error_message = "Error logging in"
 
 
 
