@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.font as tkFont
+import tkinter.font as tk_font
 from database.database import Database
 
 
@@ -20,7 +20,7 @@ class Login(tk.Frame):
         self.columnconfigure(3, weight=1)
 
         # Title
-        font = tkFont.Font(family="Helvetica", size=24, weight="bold")
+        font = tk_font.Font(family="Helvetica", size=24, weight="bold")
         title = tk.Label(self, text="Welcome to Constella!")
         title.grid(row=0, column=0, columnspan=4, padx=15, pady=45)
         title.configure(font=font)

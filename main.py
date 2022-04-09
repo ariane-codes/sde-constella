@@ -20,7 +20,9 @@ class Application(tk.Tk):
         self.resizable(False, False)
 
         self.db = Database()
-        self.employee = {}
+        self.employee = {
+            "name": ""
+        }
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -34,7 +36,7 @@ class Application(tk.Tk):
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("Login")
+        self.show_frame("ReviewList")
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
