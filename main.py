@@ -20,6 +20,7 @@ class Application(tk.Tk):
         self.resizable(False, False)
 
         self.db = Database()
+        self.employee = {}
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -50,7 +51,8 @@ class Application(tk.Tk):
         for review in reviews:
             print(str(review['review_created']) + "  " + review['review_title'] + "  " + str(review['review_star_rating']))
 
-    
+
+
 
 
 # Try running this!
