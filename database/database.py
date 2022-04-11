@@ -2,6 +2,7 @@ import os
 import mysql.connector as mysql
 from dotenv import load_dotenv
 
+
 class Database:
     """ Wrapper class for all database related funtions"""
     def __init__(self):
@@ -56,11 +57,13 @@ class Database:
             if password == myresult[5]:
                 return {"status": 200,
                         "message": "Login successful",
-                        "emp_id": myresult[0],
-                        "emp_first_name": myresult[1],
-                        "emp_last_name": myresult[2],
-                        "emp_email": myresult[3],
-                        "emp_username": myresult[4]
+                        "employee_data": {
+                            "emp_id": myresult[0],
+                            "emp_first_name": myresult[1],
+                            "emp_last_name": myresult[2],
+                            "emp_email": myresult[3],
+                            "emp_username": myresult[4]
+                            }
                         }
             # if password doesn't match return 400 - Error
             return {"status": 400, "message": "Incorrect email or password"}

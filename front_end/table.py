@@ -13,9 +13,19 @@ def generate_table(parent_for_table):
     # Define the columns for the table. They need to be the same as the data
     # that comes from the database.
     table_columns = (
+        "review_id",
         "review_created",
         "review_star_rating",
-        "review_customer_id",
+        "premier_customer",
+        "review_title",
+        "review_product_category",
+        "review_purchase_price"
+    )
+
+    table_display_columns = (
+        "review_created",
+        "review_star_rating",
+        "premier_customer",
         "review_title",
         "review_product_category",
         "review_purchase_price"
@@ -25,13 +35,14 @@ def generate_table(parent_for_table):
     table = ttk.Treeview(
         parent_for_table,
         columns=table_columns,
+        displaycolumns=table_display_columns,
         show="headings"
     )
 
     # Define the headings -- how you want the columns to be displayed.
     table.heading("review_created", text="Date")
     table.heading("review_star_rating", text="Stars")
-    table.heading("review_customer_id", text="Customer ID")
+    table.heading("premier_customer", text="Premier")
     table.heading("review_title", text="Title")
     table.heading("review_product_category", text="Product Category")
     table.heading("review_purchase_price", text="Price", anchor="center")
@@ -39,7 +50,7 @@ def generate_table(parent_for_table):
     # Column styling
     table.column("review_created", minwidth=10, anchor="center")
     table.column("review_star_rating", width=60, anchor="center")
-    table.column("review_customer_id", width=100, anchor="center")
+    table.column("premier_customer", width=100, anchor="center")
     table.column("review_title", anchor=tk.W)
     table.column("review_product_category", anchor="center")
     table.column("review_purchase_price", stretch=False, width=100, anchor="center")
