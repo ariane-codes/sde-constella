@@ -20,7 +20,9 @@ class Application(tk.Tk):
         self.resizable(False, False)
 
         self.db = Database()
-        self.employee = {}
+        self.employee = {
+            "name": "Dummy Name"
+        }
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)

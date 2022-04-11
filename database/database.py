@@ -76,7 +76,7 @@ class Database:
             self.__close()
             return err
 
-    def get_reviews(self, stars=3,page_size=5, last_review_id=0):
+    def get_reviews(self, stars=3, page_size=5, last_review_id=0):
         """This function returns 'page_size' number of reviews that have not been
         assigned to an employee, have 'stars' number of stars or less and have
         and id number greater than 'last_review_id' ordered by created date decending """
