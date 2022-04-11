@@ -52,7 +52,7 @@ class Database:
         # if email is found check password
         if myresult:
             # if passed password parameter matches password for matched email
-            # result(column 5) return 200 - successs
+            # result(column 5) return 200 - success
             if password == myresult[5]:
                 return {"status": 200,
                         "message": "Login successful",
@@ -65,7 +65,7 @@ class Database:
             # if password doesn't match return 400 - Error
             return {"status": 400, "message": "Incorrect email or password"}
         # if email is not found return 400 - Error
-        return {"status": 400, "message": "Incorrect email or password"}   
+        return {"status": 400, "message": "Incorrect email or password"} 
 
     # Database query funtion takes sql query as a string and prints + returns results
     def query(self, sql):
@@ -88,13 +88,15 @@ class Database:
         and id number greater than 'last_review_id' ordered by created date decending """
         self.__connect()
         if last_review_id > 0:
-            sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
-            " <= %s AND id < %s ORDER BY id DESC LIMIT %s"
+            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c "\
+                "ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating "\
+                "<= %s AND r.id < %s ORDER BY r.id DESC LIMIT %s"
             vals = (stars, last_review_id, page_size)
         else:
-            sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
-                " <= %s ORDER BY id DESC LIMIT %s"
-            vals = (stars, page_size)     
+            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c "\
+                "ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating "\
+                "<= %s ORDER BY r.id DESC LIMIT %s"
+            vals = (stars, page_size)
         try:
             self.mycursor.execute(sql, vals)
             # Tested with fetchmany(page_size) but this was slower than using sql LIMIT
@@ -112,7 +114,8 @@ class Database:
                              "review_purchase_price" : row[7],
                              "review_created" : row[8],
                              "review_customer_id" : row[9],
-                             "review_employee_id" : row[10]
+                             "review_employee_id" : row[10],
+                             "review_customer_premier": row[11]
                             }
                 reviews.append(temp_dict)
             return reviews
@@ -120,5 +123,3 @@ class Database:
             print(err)
             self.__close()
             return err
-
-
