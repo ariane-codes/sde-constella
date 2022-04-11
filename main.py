@@ -36,7 +36,7 @@ class Application(tk.Tk):
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("ReviewList")
+        self.show_frame("Login")
 
     def show_frame(self, page_name):
         frame = self.frames[page_name]
