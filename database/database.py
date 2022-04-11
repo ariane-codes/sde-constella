@@ -66,15 +66,9 @@ class Database:
                             }
                         }
             # if password doesn't match return 400 - Error
-<<<<<<< HEAD
             return {"status": 400, "message": "Incorrect email or password"}
         # if email is not found return 400 - Error
         return {"status": 400, "message": "Incorrect email or password"} 
-=======
-            return {"status": 400, "message": "Incorrect username or password"}
-        # if username is not found return 400 - Error
-        return {"status": 400, "message": "Incorrect username or password"}
->>>>>>> f86ca59 (Create assign_review function in the Database class)
 
     # Database query funtion takes sql query as a string and prints + returns results
     def query(self, sql):
