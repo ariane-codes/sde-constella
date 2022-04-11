@@ -66,9 +66,15 @@ class Database:
                             }
                         }
             # if password doesn't match return 400 - Error
+<<<<<<< HEAD
             return {"status": 400, "message": "Incorrect email or password"}
         # if email is not found return 400 - Error
         return {"status": 400, "message": "Incorrect email or password"} 
+=======
+            return {"status": 400, "message": "Incorrect username or password"}
+        # if username is not found return 400 - Error
+        return {"status": 400, "message": "Incorrect username or password"}
+>>>>>>> d37ce1f3b642dd2d27785091c9ad36b8ad161c1f
 
     # Database query funtion takes sql query as a string and prints + returns results
     def query(self, sql):
