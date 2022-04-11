@@ -34,15 +34,14 @@ class Database:
         except mysql.Error as err:
             print(err)
 
-    # Database login funcion takes username and password as parameters
-    # and returns dictionary containing status & message
-    def login(self, username, password):
-        """  Login function takes a username and password
+    def login(self, email, password):
+        """  Login function takes a email and password
         and returns dictionary containing 'status: 200 and success message'
-        or 'status: 400 & login failed message' """
-        # check db for username
-        sql = "select * from employee where username = %s"
-        val = username
+        or 'status: 400 & login failed message' & employee Id, first name, last name,
+        email & username """
+        # check db for email
+        sql = "select * from employee where email = %s"
+        val = email
         self.__connect()
         try:
             self.mycursor.execute(sql, (val,))
@@ -50,16 +49,23 @@ class Database:
             print(err)
         myresult = self.mycursor.fetchone()
         self.__close()
-        # if username is found check password
+        # if email is found check password
         if myresult:
-            # if passed password parameter matches password for matched username
+            # if passed password parameter matches password for matched email
             # result(column 5) return 200 - success
             if password == myresult[5]:
-                return {"status": 200, "message": "Login successful"}
+                return {"status": 200,
+                        "message": "Login successful",
+                        "emp_id": myresult[0],
+                        "emp_first_name": myresult[1],
+                        "emp_last_name": myresult[2],
+                        "emp_email": myresult[3],
+                        "emp_username": myresult[4]
+                        }
             # if password doesn't match return 400 - Error
-            return {"status": 400, "message": "Incorrect username or password"}
-        # if username is not found return 400 - Error
-        return {"status": 400, "message": "Incorrect username or password"}   
+            return {"status": 400, "message": "Incorrect email or password"}
+        # if email is not found return 400 - Error
+        return {"status": 400, "message": "Incorrect email or password"} 
 
     # Database query funtion takes sql query as a string and prints + returns results
     def query(self, sql):
@@ -82,13 +88,15 @@ class Database:
         and id number greater than 'last_review_id' ordered by created date decending """
         self.__connect()
         if last_review_id > 0:
-            sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
-            " <= %s AND id < %s ORDER BY id DESC LIMIT %s"
+            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c "\
+                "ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating "\
+                "<= %s AND r.id < %s ORDER BY r.id DESC LIMIT %s"
             vals = (stars, last_review_id, page_size)
         else:
-            sql = "SELECT * FROM review WHERE employee_id IS NULL AND star_rating"\
-                " <= %s ORDER BY id DESC LIMIT %s"
-            vals = (stars, page_size)     
+            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c "\
+                "ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating "\
+                "<= %s ORDER BY r.id DESC LIMIT %s"
+            vals = (stars, page_size)
         try:
             self.mycursor.execute(sql, vals)
             # Tested with fetchmany(page_size) but this was slower than using sql LIMIT
@@ -106,7 +114,8 @@ class Database:
                              "review_purchase_price" : row[7],
                              "review_created" : row[8],
                              "review_customer_id" : row[9],
-                             "review_employee_id" : row[10]
+                             "review_employee_id" : row[10],
+                             "review_customer_premier": row[11]
                             }
                 reviews.append(temp_dict)
             return reviews
