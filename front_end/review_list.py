@@ -14,6 +14,7 @@ class ReviewList(tk.Frame):
         self.reviews = db.get_reviews(page_size=10, last_review_id=0)
         self.start = 0
         self.end = 9
+        self.selected_review = None
 
         # Setting column configure so everything is well spread horizontally
         self.columnconfigure(0, weight=3)
@@ -28,14 +29,14 @@ class ReviewList(tk.Frame):
 
         # Employee name
         employee_name_font = tk.font.Font(family="Helvetica", size=16, weight="bold")
-        employee_name_label = tk.Label(self, text=self.controller.employee["name"])
-        employee_name_label.grid(row=0, column=1, columnspan=1, sticky=tk.NS)
-        employee_name_label.configure(font=employee_name_font)
+        self.employee_name_label = tk.Label(self, text=f"{self.controller.employee['emp_first_name']} {self.controller.employee['emp_last_name']}")
+        self.employee_name_label.grid(row=0, column=1, columnspan=1, sticky=tk.NS)
+        self.employee_name_label.configure(font=employee_name_font)
 
         # Logout button (simply display login page again
         logout_button = tk.Button(self, text="Logout",
                                   command=lambda: self.controller.show_frame("Login"))
-        logout_button.grid(row=0, column=2, columnspan=1)
+        logout_button.grid(row=0, column=2, columnspan=1, sticky=tk.E, padx=20)
         logout_button.config(width=15)
 
         # A subframe contains the table and the next/back buttons
@@ -73,6 +74,19 @@ class ReviewList(tk.Frame):
         )
         next_button.grid(row=1, column=1, padx=15, pady=20, sticky=tk.E)
 
+        # Bind the Treeview Select event to the on_select function
+        self.table.bind("<<TreeviewSelect>>", self.on_select)
+
+        # Go to review button
+        self.go_to_review_button = tk.Button(
+            self,
+            text="Go to review",
+            state="disabled",
+            width=15,
+            command=lambda: self.handle_go_to_review()
+        )
+        self.go_to_review_button.grid(row=2, column=2, columnspan=1, sticky=tk.E, padx=20)
+
     def fetch_reviews(self, last_review_id):
         self.reviews += self.db.get_reviews(page_size=10, last_review_id=last_review_id)
 
@@ -85,9 +99,10 @@ class ReviewList(tk.Frame):
             # We need to modify the review as it comes to fit the treeview
             # When it gets converted to a tuple
             review_modified_dictionary = {
+                "review_id": r["review_id"],
                 "review_created": r["review_created"],
                 "review_star_rating": r["review_star_rating"],
-                "review_customer_id": r["review_customer_id"],
+                "premier_customer": "Yes" if r["review_customer_premier"] == 1 else "No",
                 "review_title": r["review_title"],
                 "review_product_category": r["review_product_category"],
                 "review_purchase_price": f"${r['review_purchase_price']}"
@@ -133,3 +148,16 @@ class ReviewList(tk.Frame):
 
         if self.start <= 0:
             self.previous_button.config(state="disabled")
+
+    def refresh_employee_name(self):
+        # This is called in the login screen
+        # And resets the employee name.
+        self.employee_name_label.config(text=f"{self.controller.employee['emp_first_name']} {self.controller.employee['emp_last_name']}")
+
+    def on_select(self, event):
+        self.selected_review = self.table.item(event.widget.selection())["values"][0]
+        self.go_to_review_button.config(state="normal")
+
+    def handle_go_to_review(self):
+        self.controller.selected_review = self.selected_review
+        self.controller.show_frame("ReviewRespond")
