@@ -66,26 +66,23 @@ class Database:
                             }
                         }
             # if password doesn't match return 400 - Error
-<<<<<<< HEAD
             return {"status": 400, "message": "Incorrect email or password"}
         # if email is not found return 400 - Error
-        return {"status": 400, "message": "Incorrect email or password"} 
-=======
-            return {"status": 400, "message": "Incorrect username or password"}
-        # if username is not found return 400 - Error
-        return {"status": 400, "message": "Incorrect username or password"}
->>>>>>> d37ce1f3b642dd2d27785091c9ad36b8ad161c1f
+        return {"status": 400, "message": "Incorrect email or password"}
 
-    # Database query funtion takes sql query as a string and prints + returns results
-    def query(self, sql):
-        """  sql query function that takes an sql query as a string
-        and returns = prints the results a list object of results """
+
+    def query(self, sql, vals=None, fetchone=False):
+        """  sql query function that takes an sql query as a string, a tuple of variables
+        and the option to query for one or many, default is many
+        returns and prints results """
         self.__connect()
         try:
-            self.mycursor.execute(sql)
-            myresult = self.mycursor.fetchall()
+            self.mycursor.execute(sql, vals)
+            if fetchone:
+                myresult = self.mycursor.fetchone()
+            else:
+                myresult = self.mycursor.fetchall()
             self.__close()
-            print(myresult)
             return myresult
         except mysql.Error as err:
             print(err)
@@ -96,22 +93,18 @@ class Database:
         """This function returns 'page_size' number of reviews that have not been
         assigned to an employee, have 'stars' number of stars or less and have
         and id number greater than 'last_review_id' ordered by created date decending """
-        self.__connect()
         if last_review_id > 0:
-            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c "\
-                "ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating "\
-                "<= %s AND r.id < %s ORDER BY r.id DESC LIMIT %s"
+            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c \
+                ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating \
+                <= %s AND r.id < %s ORDER BY r.id DESC LIMIT %s"
             vals = (stars, last_review_id, page_size)
         else:
-            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c "\
-                "ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating "\
-                "<= %s ORDER BY r.id DESC LIMIT %s"
+            sql = "SELECT r.*, c.premier FROM review r LEFT JOIN customer c \
+                ON r.customer_id = c.id WHERE r.employee_id IS NULL AND r.star_rating \
+                <= %s ORDER BY r.id DESC LIMIT %s"
             vals = (stars, page_size)
         try:
-            self.mycursor.execute(sql, vals)
-            # Tested with fetchmany(page_size) but this was slower than using sql LIMIT
-            myresult = self.mycursor.fetchall()
-            self.__close()
+            myresult = self.query(sql, vals)
             reviews = []
             for row in myresult:
                 temp_dict = {"review_id" : row[0],
@@ -131,12 +124,12 @@ class Database:
             return reviews
         except mysql.Error as err:
             print(err)
-            self.__close()
             return err
 
     def assign_review(self, employee_id, review_id):
-        """ Takes an employee id and review id and adds the employee to the
-        review with the matching review id  """
+        """ Takes employee id and review id, adds the employee id to the
+        review with the matching review id and returns a dictionary containing
+        review and customer dictionaries"""
         self.__connect()
         try:
             sql = "UPDATE review set employee_id = %s\
@@ -144,7 +137,38 @@ class Database:
             vals = (employee_id, review_id)
             self.mycursor.execute(sql, vals)
             self.mydb.commit()
-        except mysql.Error as e:
-            print("MYSQL Error: " + str(e))
-        self.__close()
-
+            self.__close()
+            sql = "SELECT * FROM review\
+                   WHERE id = %s"
+            vals = (review_id,)
+            review = self.query(sql, vals, True)
+            sql = "SELECT * FROM customer\
+                   WHERE id = %s "
+            vals = (review[9],)
+            customer = self.query(sql, vals, True)
+            return {
+                "review": {
+                    "id" : review[0],
+                    "product_title" : review[1],
+                    "product_category" : review[2],
+                    "star_rating" : review[3],
+                    "status" : review[4],
+                    "title" : review[5],
+                    "body" : review[6],
+                    "purchase_price" : review[7],
+                    "created" : review[8],
+                    "customer_id" : review[9],
+                    "employee_id" : review[10]
+                },
+                "customer": {
+                    "id": customer[0],
+                    "name": customer[1],
+                    "email": customer[2],
+                    "join_date": customer[3],
+                    "premier": customer[4]
+                }
+            }
+        except mysql.Error as err:
+            print("MYSQL Error: " + str(err))
+            self.__close()
+            return err
