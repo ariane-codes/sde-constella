@@ -38,8 +38,8 @@ class Login(tk.Frame):
         password_label.grid(row=3, column=1, sticky=tk.E, padx=15, pady=15)
 
         # Password write box
-        password_entry = tk.Entry(self, textvariable=self.password, show="*", width=30)
-        password_entry.grid(row=3, column=2, sticky=tk.W, padx=15, pady=15)
+        self.password_entry = tk.Entry(self, textvariable=self.password, show="*", width=30)
+        self.password_entry.grid(row=3, column=2, sticky=tk.W, padx=15, pady=15)
 
         # Add trace callbacks to the string vars
         self.email.trace("w", self.on_input_change)
@@ -67,9 +67,9 @@ class Login(tk.Frame):
 
         if response["status"] == 200:  # If the response is 200
             self.controller.employee = response["employee_data"]  # Store employee data in the main app
-            self.controller.frames["ReviewList"].refresh_employee_name()  # Call this function
-            # From the review_list class so as to refresh the employee label
+            self.controller.frames["ReviewList"].refresh_review_list()  # Refresh review list
             self.controller.show_frame("ReviewList")  # go to the ReviewList frame
+            self.password_entry.delete(0, tk.END)  # Clear out the password upon successful login
         else:  # otherwise
             self.error_label.grid(row=5, column=0, columnspan=4)  # Display error message.
 

@@ -1,13 +1,10 @@
 import tkinter as tk
+from datetime import datetime
+
 from front_end.login import Login
 from front_end.review_list import ReviewList
 from front_end.review_respond import ReviewRespond
 from database.database import Database
-
-
-# I'm using an OOP approach for this app.
-# Check this Stack Overflow answer:
-# https://stackoverflow.com/questions/17466561/best-way-to-structure-a-tkinter-application/17470842#17470842
 
 
 class Application(tk.Tk):
@@ -23,8 +20,33 @@ class Application(tk.Tk):
         self.employee = {
             "emp_first_name": "Dummy",
             "emp_last_name": "Name",
+            "emp_id": None
         }
         self.selected_review = None
+
+        # self.review_data & self.customer_data are populated in
+        # ReviewList after db.assign_review() is called
+        # THIS IS DUMMY DATA
+        self.review_data = {
+            "id": 1234,
+            "product_title": "A baby swing lalala lalala lalala lalal lalalala lalalal lala la",
+            "product_category": "Dummy Category",
+            "star_rating": 2,
+            "status": "NEW",
+            "title": "This swing did not help my daughter at all. ... A baby swing lalala lalala lalala lalal lalalala lalalal lala la",
+            "body": "This swing did not help my daughter at all.  Put her in it multiple times for 3 months with no success, the longest she sat unit was 20 min.  Get a regular swing.",
+            "purchase_price": 7.03,
+            "created": datetime.strptime("2022-02-24 16:27:17", "%Y-%m-%d %H:%M:%S"),
+            "customer_id": 1152,
+            "employee_id": 1
+        }
+        self.customer_data = {
+            "id": 1152,
+            "name": "Naoko Matsuda",
+            "email": "N.Matsuda363@example.com",
+            "join_date": datetime.strptime("2020-07-20 06:21:34", "%Y-%m-%d %H:%M:%S"),
+            "premier": 1
+        }
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -44,22 +66,7 @@ class Application(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def test_login(self):
-        # Database testing code 
-        response = self.db.login('natalie.smith', 'C0n$t3ll4')
-        print("Status: " + str(response['status']))
-        print("Message: " + str(response['message']))
 
-    def test_get_reviews(self):
-        reviews = self.db.get_reviews()
-        for review in reviews:
-            print(str(review['review_created']) + "  " + review['review_title'] + "  " + str(review['review_star_rating']))
-
-
-
-
-
-# Try running this!
 if __name__ == '__main__':
 
     app = Application()
