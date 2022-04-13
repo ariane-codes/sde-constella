@@ -100,12 +100,12 @@ class ReviewList(tk.Frame):
             # When it gets converted to a tuple
             review_modified_dictionary = {
                 "review_id": r["review_id"],
-                "review_created": r["review_created"],
+                "review_created": r["review_created"].strftime("%Y-%m-%d %H:%M"),
                 "review_star_rating": r["review_star_rating"],
                 "premier_customer": "Yes" if r["review_customer_premier"] == 1 else "No",
                 "review_title": r["review_title"],
                 "review_product_category": r["review_product_category"],
-                "review_purchase_price": f"${r['review_purchase_price']}"
+                "review_purchase_price": f"£{r['review_purchase_price']}"
             }
             # Convert the dictionary into a tuple
             review_tuple = tuple(review_modified_dictionary.values())
@@ -125,6 +125,8 @@ class ReviewList(tk.Frame):
 
         # Now we've made sure we got the reviews, we can go ahead and display the next page.
 
+        self.table.selection_clear()  # Clear out selection before deleting children to prevent errors
+
         # We do this by DELETING the existing rows
         self.table.delete(*self.table.get_children())
 
@@ -141,6 +143,8 @@ class ReviewList(tk.Frame):
         # We will always have the "previous" reviews, so no need to refetch anything.
         # Similar to handle_next, but we'll subtract 10.
 
+        self.table.selection_clear()  # Clear out selection before deleting children to prevent errors
+
         self.table.delete(*self.table.get_children())
         self.start -= 10
         self.end -= 10
@@ -149,15 +153,55 @@ class ReviewList(tk.Frame):
         if self.start <= 0:
             self.previous_button.config(state="disabled")
 
+    def refresh_review_list(self):
+        print("Refreshing review list, getting initial reviews.")
+        self.reviews = self.db.get_reviews(page_size=10, last_review_id=0)
+        self.start = 0
+        self.end = 9
+        self.selected_review = None
+
+        self.table.selection_clear()  # Clear out selection before deleting children to prevent errors
+
+        # Delete existing rows in the table
+        self.table.delete(*self.table.get_children())
+
+        # Insert the new rows
+        self.insert_reviews(self.start, self.end)
+
+        # Refresh employee name
+        self.employee_name_label.config(
+            text=f"{self.controller.employee['emp_first_name']} {self.controller.employee['emp_last_name']}")
+
+        # Disable "previous" button
+        self.previous_button.config(state="disabled")
+
     def refresh_employee_name(self):
         # This is called in the login screen
         # And resets the employee name.
         self.employee_name_label.config(text=f"{self.controller.employee['emp_first_name']} {self.controller.employee['emp_last_name']}")
 
     def on_select(self, event):
-        self.selected_review = self.table.item(event.widget.selection())["values"][0]
+        selected_items = self.table.item(event.widget.selection())["values"]
+        if selected_items:
+            self.selected_review = selected_items[0] # Avoiding index out of range error
         self.go_to_review_button.config(state="normal")
 
     def handle_go_to_review(self):
+        # Pass the review_id to MainApplication
         self.controller.selected_review = self.selected_review
+
+        # Call assign_review
+        assign_review_response = self.db.assign_review(
+            self.controller.employee["emp_id"],
+            self.selected_review
+        )
+        selected_review_full_data = assign_review_response["review"]
+        customer_full_data = assign_review_response["customer"]
+
+        # Pass the data to MainApplication
+        self.controller.review_data = selected_review_full_data
+        self.controller.customer_data = customer_full_data
+
+        # Refresh ReviewRespond and display it
+        self.controller.frames["ReviewRespond"].refresh_fields()
         self.controller.show_frame("ReviewRespond")
