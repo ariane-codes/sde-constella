@@ -20,32 +20,4 @@ def db_connect():
         print(err)
     return mydb
 
-@pytest.fixture
-def db_close(mycursor, mydb):
-    try:
-        mycursor.close()
-        mydb.close()
-        print("PYTEST: Database connection closed")
-    except mysql.Error as err:
-        print(err)
-
-@pytest.fixture
-def query(sql, vals=None, fetchone=False):
-    """  sql query function that takes an sql query as a string, a tuple of variables
-    and the option to query for one or many, default is many
-    returns and prints results """
-    mydb = db_connect()
-    mycursor = mydb.cursor()
-    try:
-        mycursor.execute(sql, vals)
-        if fetchone:
-            myresult = mycursor.fetchone()
-        else:
-            myresult = mycursor.fetchall()
-        db_close(mycursor, mydb)
-        return myresult
-    except mysql.Error as err:
-        print(err)
-        db_close(mycursor, mydb)
-        return err
 
