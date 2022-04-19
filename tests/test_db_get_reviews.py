@@ -55,7 +55,7 @@ def test_get_reviews_star_rating():
         assert each['review_star_rating'] <= 3
 
 def test_get_reviews_order_desc():    
-    """ This function test that reviews are sorted by created date in descending order """
+    """ This function tests that reviews are sorted by created date in descending order """
 
     reviews = db.get_reviews()
     for index, each in enumerate(reviews):
@@ -109,7 +109,7 @@ def test_get_reviews_pagination(db_connect):
 
 def test_get_reviews_unassigned():
     """ This function tests a large sample of returned reviews to ensure that
-    all returned reviews are not already assigned to an emmployee"""
+    all returned reviews are not already assigned to an employee"""
 
     reviews = db.get_reviews(page_size=100)
 
