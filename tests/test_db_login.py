@@ -7,14 +7,18 @@ db = Database()
 
 def test_login_success():
     """ database successful login function test """
-    assert db.login('natalie.smith', 'C0n$t3ll4') == {"status": 200, "message": "Login successful"}
+    login_result = db.login('natalie.smith@constella.com', 'C0n$t3ll4')
+    assert login_result['status'] == 200
+    assert login_result['message'] == "Login successful"
 
 def test_login_incorrect_username():
     """ database unsuccessful login function test for incorrect username"""
-    assert db.login('invalid.user', 'C0n$t3ll4') ==\
-    {"status": 400, "message": "Incorrect username or password"}
+    login_result=db.login('paolasz@constella.com', 'C0n$t3ll4')
+    assert login_result["status"] == 400
+    assert login_result["message"] == "Incorrect email or password"
 
 def test_login_incorrect_password():
     """ database unsuccessful login function test for incorrect password"""
-    assert db.login('natalie.smith', 'invalidPassword') ==\
-    {"status": 400, "message": "Incorrect username or password"}
+    login_result=db.login('natalie.smith@constella.com', 'invalidPassword')
+    assert login_result["status"] == 400
+    assert login_result["message"] == "Incorrect email or password"
