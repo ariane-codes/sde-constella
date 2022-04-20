@@ -172,3 +172,4 @@ class Database:
             print("MYSQL Error: " + str(err))
             self.__close()
             return err
+
